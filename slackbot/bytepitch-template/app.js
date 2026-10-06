@@ -58,6 +58,7 @@ app.event("app_mention", async ({ event, say }) => {
   app.logger.info('⚡️ Bolt app is running!');
 
   // send a message to the channel to a specific channel
+  // must first invite the bot to the channel (you can send a message with the @botname in said channel to easily do this)
   if (process.env.SLACK_CHANNEL_ID) {  
     app.client.chat.postMessage({
       channel: process.env.SLACK_CHANNEL_ID,
