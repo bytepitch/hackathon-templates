@@ -1,0 +1,16 @@
+services:
+  web:
+    build: .
+    ports:
+      - "5173:5173"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # Inside Docker, "localhost" is the container itself. This reaches the API running on your machine
+      VITE_API_URL: http://host.docker.internal:3000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public

@@ -1,0 +1,88 @@
+import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
+import { describe, expect, it } from 'vitest';
+import { server } from '@/test/server';
+import { renderWithProviders } from '@/test/render';
+import type { {{Entity}} } from './api';
+import { {{Entities}}Page } from './{{Entities}}Page';
+
+// The fields the page uses. The mock API only needs these
+type Row = Pick<{{Entity}}, 'id' | 'name'>;
+
+// An in-memory version of the API's /api/{{entitiesPath}} endpoints
+function mockApi(initial: Row[] = []) {
+  let rows = [...initial];
+  let nextId = rows.length + 1;
+
+  server.use(
+    http.get('*/api/{{entitiesPath}}', () => HttpResponse.json(rows)),
+    http.post('*/api/{{entitiesPath}}', async ({ request }) => {
+      const { name } = (await request.json()) as { name: string };
+      const row: Row = { id: nextId++, name };
+      rows.push(row);
+      return HttpResponse.json(row, { status: 201 });
+    }),
+    http.delete('*/api/{{entitiesPath}}/:id', ({ params }) => {
+      rows = rows.filter((row) => String(row.id) !== params.id);
+      return new HttpResponse(null, { status: 204 });
+    }),
+  );
+}
+
+describe('{{Entities}}Page', () => {
+  it('lists the {{entitiesText}} from the API', async () => {
+    mockApi([{ id: 1, name: 'First' }]);
+
+    renderWithProviders(<{{Entities}}Page />);
+
+    expect(await screen.findByText('First')).toBeInTheDocument();
+  });
+
+  it('adds one', async () => {
+    mockApi();
+    const user = userEvent.setup();
+    renderWithProviders(<{{Entities}}Page />);
+    expect(await screen.findByText(/No {{entitiesText}} yet/)).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText('Name'), 'New');
+    await user.click(screen.getByRole('button', { name: 'Add' }));
+
+    expect(await screen.findByText('New')).toBeInTheDocument();
+    expect(screen.getByLabelText('Name')).toHaveValue('');
+  });
+
+  it("doesn't send an empty name", async () => {
+    mockApi();
+    const user = userEvent.setup();
+    renderWithProviders(<{{Entities}}Page />);
+
+    await user.click(screen.getByRole('button', { name: 'Add' }));
+
+    expect(await screen.findByText('Name is required')).toBeInTheDocument();
+  });
+
+  it('deletes one', async () => {
+    mockApi([{ id: 1, name: 'First' }]);
+    const user = userEvent.setup();
+    renderWithProviders(<{{Entities}}Page />);
+
+    await user.click(await screen.findByRole('button', { name: 'Delete First' }));
+
+    expect(await screen.findByText(/No {{entitiesText}} yet/)).toBeInTheDocument();
+  });
+
+  it('shows an error when the API fails', async () => {
+    server.use(
+      http.get('*/api/{{entitiesPath}}', () =>
+        HttpResponse.json({ message: 'Internal server error' }, { status: 500 }),
+      ),
+    );
+
+    renderWithProviders(<{{Entities}}Page />);
+
+    expect(
+      await screen.findByText(/Couldn't load {{entitiesText}}: Internal server error/),
+    ).toBeInTheDocument();
+  });
+});

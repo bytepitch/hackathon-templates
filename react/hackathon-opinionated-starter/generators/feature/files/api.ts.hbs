@@ -1,0 +1,33 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { api, unwrap } from '@/shared/api/client';
+import type { RequestBody, ResponseBody } from '@/shared/api/types';
+
+export type {{Entity}} = ResponseBody<'/api/{{entitiesPath}}', 'get'>[number];
+export type Create{{Entity}}Input = RequestBody<'/api/{{entitiesPath}}', 'post'>;
+
+const {{entities}}Key = ['{{entitiesPath}}'] as const;
+
+export function use{{Entities}}() {
+  return useQuery({
+    queryKey: {{entities}}Key,
+    queryFn: () => unwrap(api.GET('/api/{{entitiesPath}}')),
+  });
+}
+
+export function useCreate{{Entity}}() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: Create{{Entity}}Input) =>
+      unwrap(api.POST('/api/{{entitiesPath}}', { body })),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: {{entities}}Key }),
+  });
+}
+
+export function useDelete{{Entity}}() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: {{Entity}}['id']) =>
+      unwrap(api.DELETE('/api/{{entitiesPath}}/{id}', { params: { path: { id } } })),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: {{entities}}Key }),
+  });
+}

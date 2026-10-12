@@ -1,0 +1,80 @@
+import { Trash2Icon } from 'lucide-react';
+import { Button } from '@/shared/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
+import { Skeleton } from '@/shared/ui/skeleton';
+import { useDelete{{Entity}}, use{{Entities}}, type {{Entity}} } from './api';
+import { Create{{Entity}}Form } from './Create{{Entity}}Form';
+
+export function {{Entities}}Page() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{{EntitiesText}}</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-6">
+        <Create{{Entity}}Form />
+        <{{Entities}}List />
+      </CardContent>
+    </Card>
+  );
+}
+
+function {{Entities}}List() {
+  const { data, isPending, isError, error, refetch } = use{{Entities}}();
+
+  if (isPending) {
+    return (
+      <div className="flex flex-col gap-2" aria-label="Loading {{entitiesText}}">
+        <Skeleton className="h-10" />
+        <Skeleton className="h-10" />
+        <Skeleton className="h-10" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-between gap-4 rounded-lg border border-destructive/40 p-4 text-sm">
+        <p>Couldn't load {{entitiesText}}: { error.message }</p>
+        <Button variant="outline" size="sm" onClick={() => refetch()}>
+          Try again
+        </Button>
+      </div>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        No {{entitiesText}} yet. Add one above.
+      </p>
+    );
+  }
+
+  return (
+    <ul className="flex flex-col divide-y rounded-lg border">
+      { data.map((row) => (
+        <{{Entity}}Row key={ row.id } row={ row } />
+      )) }
+    </ul>
+  );
+}
+
+function {{Entity}}Row({ row }: { row: {{Entity}} }) {
+  const delete{{Entity}} = useDelete{{Entity}}();
+
+  return (
+    <li className="flex items-center justify-between gap-4 px-4 py-2">
+      <p className="font-medium">{ row.name }</p>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label={ `Delete ${ row.name }` }
+        disabled={ delete{{Entity}}.isPending }
+        onClick={() => delete{{Entity}}.mutate(row.id)}
+      >
+        <Trash2Icon />
+      </Button>
+    </li>
+  );
+}
