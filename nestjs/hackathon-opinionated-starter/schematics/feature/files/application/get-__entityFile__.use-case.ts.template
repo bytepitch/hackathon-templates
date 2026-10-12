@@ -1,0 +1,17 @@
+import { Injectable } from '@nestjs/common';
+import type { <%= Entity %> } from '../domain/<%= entityFile %>.js';
+import { <%= Entity %>NotFoundError } from '../domain/<%= entityFile %>.errors.js';
+import { <%= Entity %>Repository } from '../domain/<%= entityFile %>.repository.js';
+
+@Injectable()
+export class Get<%= Entity %> {
+  constructor(private readonly <%= entities %>: <%= Entity %>Repository) {}
+
+  async execute(id: number): Promise<<%= Entity %>> {
+    const <%= entity %> = await this.<%= entities %>.findById(id);
+    if (!<%= entity %>) {
+      throw new <%= Entity %>NotFoundError(id);
+    }
+    return <%= entity %>;
+  }
+}

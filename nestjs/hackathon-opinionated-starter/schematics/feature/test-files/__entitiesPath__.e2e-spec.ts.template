@@ -1,0 +1,81 @@
+import { INestApplication } from '@nestjs/common';
+import request from 'supertest';
+import { App } from 'supertest/types.js';
+import { createTestApp } from './test-app.js';
+
+describe('<%= Entities %> (e2e)', () => {
+  let app: INestApplication<App>;
+  let api: ReturnType<typeof request>;
+
+  beforeEach(async () => {
+    app = await createTestApp();
+    api = request(app.getHttpServer());
+  });
+
+  afterEach(async () => {
+    await app.close();
+  });
+
+  it('creates <%= aLabel %>', async () => {
+    const response = await api.post('/api/<%= entitiesPath %>').send({ name: 'Coffee' });
+
+    expect(response.status).toBe(201);
+    expect(response.body.name).toBe('Coffee');
+    expect(response.body).toHaveProperty('id');
+    expect(response.body).toHaveProperty('createdAt');
+  });
+
+  it('rejects <%= aLabel %> without a name', async () => {
+    const missing = await api.post('/api/<%= entitiesPath %>').send({});
+    const blank = await api.post('/api/<%= entitiesPath %>').send({ name: '   ' });
+
+    expect(missing.status).toBe(400);
+    expect(blank.status).toBe(400);
+    expect(blank.body.message).toBe('<%= Label %> name cannot be empty');
+  });
+
+  it('lists <%= labels %>', async () => {
+    await api.post('/api/<%= entitiesPath %>').send({ name: 'Coffee' });
+    await api.post('/api/<%= entitiesPath %>').send({ name: 'Tea' });
+
+    const response = await api.get('/api/<%= entitiesPath %>');
+
+    expect(response.status).toBe(200);
+    expect(response.body.map((<%= entity %>: { name: string }) => <%= entity %>.name)).toEqual([
+      'Coffee',
+      'Tea',
+    ]);
+  });
+
+  it('gets <%= aLabel %>', async () => {
+    const created = (await api.post('/api/<%= entitiesPath %>').send({ name: 'Coffee' }))
+      .body;
+
+    const response = await api.get(`/api/<%= entitiesPath %>/${created.id}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(created);
+  });
+
+  it('returns 404 for a missing <%= label %>', async () => {
+    const response = await api.get('/api/<%= entitiesPath %>/999');
+
+    expect(response.status).toBe(404);
+  });
+
+  it('deletes <%= aLabel %>', async () => {
+    const created = (await api.post('/api/<%= entitiesPath %>').send({ name: 'Coffee' }))
+      .body;
+
+    const response = await api.delete(`/api/<%= entitiesPath %>/${created.id}`);
+
+    expect(response.status).toBe(204);
+    expect((await api.get(`/api/<%= entitiesPath %>/${created.id}`)).status).toBe(404);
+  });
+
+  it('returns 404 when deleting a missing <%= label %>', async () => {
+    const response = await api.delete('/api/<%= entitiesPath %>/999');
+
+    expect(response.status).toBe(404);
+  });
+});

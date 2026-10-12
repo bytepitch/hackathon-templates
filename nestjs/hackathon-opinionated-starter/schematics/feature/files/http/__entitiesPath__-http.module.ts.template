@@ -1,0 +1,10 @@
+import { Module } from '@nestjs/common';
+import { <%= Entities %>Module } from '../<%= entitiesPath %>.module.js';
+import { <%= Entities %>Controller } from './<%= entitiesPath %>.controller.js';
+
+// Exposes the <%= labels %> use cases over HTTP. Other transports import <%= Entities %>Module directly
+@Module({
+  imports: [<%= Entities %>Module],
+  controllers: [<%= Entities %>Controller],
+})
+export class <%= Entities %>HttpModule {}
