@@ -1,0 +1,14 @@
+import { Injectable } from '@nestjs/common';
+import { <%= Entity %>NotFoundError } from '../domain/<%= entityFile %>.errors.js';
+import { <%= Entity %>Repository } from '../domain/<%= entityFile %>.repository.js';
+
+@Injectable()
+export class Delete<%= Entity %> {
+  constructor(private readonly <%= entities %>: <%= Entity %>Repository) {}
+
+  async execute(id: number): Promise<void> {
+    if (!(await this.<%= entities %>.delete(id))) {
+      throw new <%= Entity %>NotFoundError(id);
+    }
+  }
+}

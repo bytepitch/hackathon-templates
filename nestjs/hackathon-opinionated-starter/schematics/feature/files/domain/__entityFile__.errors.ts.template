@@ -1,0 +1,7 @@
+import { NotFoundError } from '../../../shared/domain/errors.js';
+
+export class <%= Entity %>NotFoundError extends NotFoundError {
+  constructor(id: number) {
+    super(`<%= Label %> ${id} not found`);
+  }
+}

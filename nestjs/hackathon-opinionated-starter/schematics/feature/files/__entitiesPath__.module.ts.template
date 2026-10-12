@@ -1,0 +1,19 @@
+import { Module } from '@nestjs/common';
+import { Create<%= Entity %> } from './application/create-<%= entityFile %>.use-case.js';
+import { Delete<%= Entity %> } from './application/delete-<%= entityFile %>.use-case.js';
+import { Get<%= Entity %> } from './application/get-<%= entityFile %>.use-case.js';
+import { List<%= Entities %> } from './application/list-<%= entitiesPath %>.use-case.js';
+import { <%= Entity %>Repository } from './domain/<%= entityFile %>.repository.js';
+import { Postgres<%= Entity %>Repository } from './infrastructure/postgres-<%= entityFile %>.repository.js';
+
+const useCases = [Create<%= Entity %>, List<%= Entities %>, Get<%= Entity %>, Delete<%= Entity %>];
+
+// Only the use cases are exported. The repository stays private to this module
+@Module({
+  providers: [
+    ...useCases,
+    { provide: <%= Entity %>Repository, useClass: Postgres<%= Entity %>Repository },
+  ],
+  exports: useCases,
+})
+export class <%= Entities %>Module {}

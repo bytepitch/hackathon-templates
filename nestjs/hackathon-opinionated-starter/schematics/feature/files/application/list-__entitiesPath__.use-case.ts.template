@@ -1,0 +1,12 @@
+import { Injectable } from '@nestjs/common';
+import type { <%= Entity %> } from '../domain/<%= entityFile %>.js';
+import { <%= Entity %>Repository } from '../domain/<%= entityFile %>.repository.js';
+
+@Injectable()
+export class List<%= Entities %> {
+  constructor(private readonly <%= entities %>: <%= Entity %>Repository) {}
+
+  execute(): Promise<<%= Entity %>[]> {
+    return this.<%= entities %>.findAll();
+  }
+}

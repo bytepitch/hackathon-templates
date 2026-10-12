@@ -1,0 +1,61 @@
+import { Inject, Injectable } from '@nestjs/common';
+import type { Kysely, Selectable } from 'kysely';
+import { KYSELY } from '../../../shared/database/database.module.js';
+import type {
+  Database,
+  <%= Entities %>Table,
+} from '../../../shared/database/database.types.js';
+import { <%= Entity %> } from '../domain/<%= entityFile %>.js';
+import { <%= Entity %>Repository } from '../domain/<%= entityFile %>.repository.js';
+
+@Injectable()
+export class Postgres<%= Entity %>Repository implements <%= Entity %>Repository {
+  constructor(@Inject(KYSELY) private readonly db: Kysely<Database>) {}
+
+  async findAll(): Promise<<%= Entity %>[]> {
+    const rows = await this.db
+      .selectFrom('<%= entities %>')
+      .selectAll()
+      .orderBy('id')
+      .execute();
+    return rows.map(to<%= Entity %>);
+  }
+
+  async findById(id: number): Promise<<%= Entity %> | null> {
+    const row = await this.db
+      .selectFrom('<%= entities %>')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
+    return row ? to<%= Entity %>(row) : null;
+  }
+
+  async save(<%= entity %>: <%= Entity %>): Promise<<%= Entity %>> {
+    const row =
+      <%= entity %>.id === null
+        ? await this.db
+            .insertInto('<%= entities %>')
+            .values({ name: <%= entity %>.name, createdAt: <%= entity %>.createdAt })
+            .returningAll()
+            .executeTakeFirstOrThrow()
+        : await this.db
+            .updateTable('<%= entities %>')
+            .set({ name: <%= entity %>.name })
+            .where('id', '=', <%= entity %>.id)
+            .returningAll()
+            .executeTakeFirstOrThrow();
+    return to<%= Entity %>(row);
+  }
+
+  async delete(id: number): Promise<boolean> {
+    const result = await this.db
+      .deleteFrom('<%= entities %>')
+      .where('id', '=', id)
+      .executeTakeFirst();
+    return result.numDeletedRows > 0n;
+  }
+}
+
+function to<%= Entity %>(row: Selectable<<%= Entities %>Table>): <%= Entity %> {
+  return <%= Entity %>.restore(row.id, row.name, row.createdAt);
+}
