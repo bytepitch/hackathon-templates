@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@bytepitch/hackathon-schematics",
+  "sourceRoot": "src",
+  "compilerOptions": {
+    "deleteOutDir": true
+  }
+}

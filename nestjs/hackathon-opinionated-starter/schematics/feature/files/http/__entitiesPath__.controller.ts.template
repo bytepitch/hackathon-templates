@@ -1,0 +1,66 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+  Post,
+} from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Create<%= Entity %> } from '../application/create-<%= entityFile %>.use-case.js';
+import { Delete<%= Entity %> } from '../application/delete-<%= entityFile %>.use-case.js';
+import { Get<%= Entity %> } from '../application/get-<%= entityFile %>.use-case.js';
+import { List<%= Entities %> } from '../application/list-<%= entitiesPath %>.use-case.js';
+import { Create<%= Entity %>Request } from './dto/create-<%= entityFile %>.request.js';
+import { <%= Entity %>Response } from './dto/<%= entityFile %>.response.js';
+
+@ApiTags('<%= entitiesPath %>')
+@Controller('<%= entitiesPath %>')
+export class <%= Entities %>Controller {
+  constructor(
+    private readonly create<%= Entity %>: Create<%= Entity %>,
+    private readonly list<%= Entities %>: List<%= Entities %>,
+    private readonly get<%= Entity %>: Get<%= Entity %>,
+    private readonly delete<%= Entity %>: Delete<%= Entity %>,
+  ) {}
+
+  @Get()
+  @ApiOkResponse({ type: [<%= Entity %>Response] })
+  async list(): Promise<<%= Entity %>Response[]> {
+    const <%= entities %> = await this.list<%= Entities %>.execute();
+    return <%= entities %>.map((<%= entity %>) => <%= Entity %>Response.from(<%= entity %>));
+  }
+
+  @Post()
+  @ApiCreatedResponse({ type: <%= Entity %>Response })
+  @ApiBadRequestResponse()
+  async create(@Body() body: Create<%= Entity %>Request): Promise<<%= Entity %>Response> {
+    return <%= Entity %>Response.from(
+      await this.create<%= Entity %>.execute({ name: body.name }),
+    );
+  }
+
+  @Get(':id')
+  @ApiOkResponse({ type: <%= Entity %>Response })
+  @ApiNotFoundResponse()
+  async get(@Param('id', ParseIntPipe) id: number): Promise<<%= Entity %>Response> {
+    return <%= Entity %>Response.from(await this.get<%= Entity %>.execute(id));
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  @ApiNoContentResponse()
+  @ApiNotFoundResponse()
+  async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.delete<%= Entity %>.execute(id);
+  }
+}

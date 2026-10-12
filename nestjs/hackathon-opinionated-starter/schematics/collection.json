@@ -1,0 +1,12 @@
+{
+  "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "extends": ["@nestjs/schematics"],
+  "schematics": {
+    "feature": {
+      "factory": "./feature/index.ts#feature",
+      "schema": "./feature/schema.json",
+      "description": "Create a feature module (domain, application, infrastructure, http) with CRUD endpoints.",
+      "aliases": ["f"]
+    }
+  }
+}

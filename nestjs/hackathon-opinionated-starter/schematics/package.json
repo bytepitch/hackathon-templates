@@ -1,0 +1,6 @@
+{
+  "name": "@bytepitch/hackathon-schematics",
+  "private": true,
+  "type": "module",
+  "schematics": "./collection.json"
+}

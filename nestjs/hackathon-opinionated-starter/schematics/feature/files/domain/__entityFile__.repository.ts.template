@@ -1,0 +1,9 @@
+import type { <%= Entity %> } from './<%= entityFile %>.js';
+
+export abstract class <%= Entity %>Repository {
+  abstract findAll(): Promise<<%= Entity %>[]>;
+  abstract findById(id: number): Promise<<%= Entity %> | null>;
+  abstract save(<%= entity %>: <%= Entity %>): Promise<<%= Entity %>>;
+  // Returns false if there was no <%= label %> with that id
+  abstract delete(id: number): Promise<boolean>;
+}
