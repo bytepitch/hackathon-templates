@@ -1,0 +1,34 @@
+import { ValidationError } from '../../../shared/domain/errors.js';
+
+const MAX_NAME_LENGTH = 100;
+
+export class <%= Entity %> {
+  private constructor(
+    readonly id: number | null,
+    readonly name: string,
+    readonly createdAt: Date,
+  ) {}
+
+  // A new <%= label %> that hasn't been saved yet, so it has no id
+  static create(name: string): <%= Entity %> {
+    return new <%= Entity %>(null, <%= Entity %>.validName(name), new Date());
+  }
+
+  // Rebuilds <%= aLabel %> loaded from storage
+  static restore(id: number, name: string, createdAt: Date): <%= Entity %> {
+    return new <%= Entity %>(id, name, createdAt);
+  }
+
+  private static validName(name: string): string {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      throw new ValidationError('<%= Label %> name cannot be empty');
+    }
+    if (trimmed.length > MAX_NAME_LENGTH) {
+      throw new ValidationError(
+        `<%= Label %> name cannot be longer than ${MAX_NAME_LENGTH} characters`,
+      );
+    }
+    return trimmed;
+  }
+}

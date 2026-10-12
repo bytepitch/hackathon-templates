@@ -1,0 +1,16 @@
+import { Injectable } from '@nestjs/common';
+import { <%= Entity %> } from '../domain/<%= entityFile %>.js';
+import { <%= Entity %>Repository } from '../domain/<%= entityFile %>.repository.js';
+
+export interface Create<%= Entity %>Input {
+  name: string;
+}
+
+@Injectable()
+export class Create<%= Entity %> {
+  constructor(private readonly <%= entities %>: <%= Entity %>Repository) {}
+
+  execute(input: Create<%= Entity %>Input): Promise<<%= Entity %>> {
+    return this.<%= entities %>.save(<%= Entity %>.create(input.name));
+  }
+}

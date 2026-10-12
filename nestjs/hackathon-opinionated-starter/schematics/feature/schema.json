@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "HackathonFeature",
+  "title": "Feature",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The feature name, singular or plural (e.g. orders, order-lines).",
+      "$default": { "$source": "argv", "index": 0 },
+      "x-prompt": "What's the name of the feature (e.g. orders)?"
+    },
+    "spec": {
+      "type": "boolean",
+      "default": true,
+      "description": "Generate the domain unit test and the API test."
+    },
+    "sourceRoot": {
+      "type": "string",
+      "default": "src",
+      "description": "The source root (set by the Nest CLI from nest-cli.json)."
+    }
+  },
+  "required": ["name"]
+}
