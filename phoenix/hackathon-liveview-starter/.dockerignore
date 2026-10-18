@@ -1,0 +1,14 @@
+/_build/
+/cover/
+/deps/
+/doc/
+/.env
+/.fetch
+erl_crash.dump
+*.ez
+/tmp/
+hackathon_liveview-*.tar
+/priv/static/assets/
+/priv/static/cache_manifest.json
+npm-debug.log
+/assets/node_modules/
